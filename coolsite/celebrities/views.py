@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse, HttpResponseNotFound, Http404
 from .models import *
 
@@ -35,11 +35,19 @@ def login(request):
     return HttpResponse("Авторизация")
 
 
-def show_post(request, post_id):
-    return HttpResponse(f"Отображение статьи с id = {post_id}")
+def show_post(request, post_slug):
+    post = get_object_or_404(Men, slug=post_slug)
+
+    context = {'post': post,
+               'menu': menu,
+               'title': post.title,
+               'cat_selected': post.cat_id
+               }
+    return render(request, 'celebrities/post.html', context=context)
 
 
-def show_category(request, cat_id):
+def show_category(request, cat_slug):
+    cat_id = Category.objects.get(slug=cat_slug).pk
     posts = Men.objects.filter(cat_id=cat_id)
     context = {'posts': posts,
                'menu': menu,
